@@ -9,47 +9,22 @@ const useNews = (category = "general") => {
 
   useEffect(() => {
     const fetchNews = async () => {
-      // try {
-      //   const response = await apiClient.get("/top-headlines", {
-      //     params: { country: "us", category },
-      //   });
-
-      //   const articles = response.data.articles.map((article, index) => ({
-      //     ...article,
-      //   }));
-
-      //   await saveArticles(articles);
-      //   setNews(articles);
-      // } catch (err) {
-      //   console.error("Fetching news failed, loading from IndexedDB", err);
-      //   setError("Failed to fetch news, showing cached data.");
-      //   const cachedArticles = await getArticles();
-      //   setNews(cachedArticles);
-      // } finally {
-      //   setLoading(false);
-      // }
       try {
-        if (!navigator.onLine) {
-          // Jika offline, ambil dari IndexedDB
-          const offlineMovies = await getArticles();
-          setNews(offlineMovies);
-          console.log("Menampilkan data dari IndexedDB (Offline Mode)");
-        } else {
-          // Jika online, fetch dari API
-          const response = await apiClient.get("/top-headlines", {
-            params: { country: "us", category },
-          });
-          setNews(response.data.results);
+        const response = await apiClient.get("/top-headlines", {
+          params: { country: "us", category },
+        });
 
-          // Simpan ke IndexedDB untuk penggunaan offline
-          await clearArticles();
-          saveArticles(response.data.results);
+        const articles = response.data.articles.map((article, index) => ({
+          ...article,
+        }));
 
-          console.log("Data diupdate dari API");
-        }
+        await saveArticles(articles);
+        setNews(articles);
       } catch (err) {
-        setError("Gagal memuat data.");
-        console.error("Error fetching movies:", err);
+        console.error("Fetching news failed, loading from IndexedDB", err);
+        setError("Failed to fetch news, showing cached data.");
+        const cachedArticles = await getArticles();
+        setNews(cachedArticles);
       } finally {
         setLoading(false);
       }
