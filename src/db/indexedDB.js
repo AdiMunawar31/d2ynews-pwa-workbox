@@ -2,7 +2,6 @@ import Dexie from "dexie";
 
 const db = new Dexie("newsDB");
 
-// Versi database ditingkatkan agar bisa update skema tanpa error
 db.version(2).stores({
   articles:
     "id, source, author, title, description, url, urlToImage, publishedAt, content",
@@ -11,7 +10,6 @@ db.version(2).stores({
     bookmarks: "url, title, source, publishedAt, description, urlToImage",
 });
 
-// Fungsi untuk menyimpan daftar berita
 export const saveArticles = async (articles) => {
   try {
     await db.articles.clear();
@@ -32,7 +30,6 @@ export const saveArticles = async (articles) => {
   }
 };
 
-// Fungsi untuk mendapatkan daftar berita
 export const getArticles = async () => {
   try {
     return await db.articles.toArray();
@@ -42,11 +39,10 @@ export const getArticles = async () => {
   }
 };
 
-// Fungsi untuk menyimpan detail berita
 export const saveArticleDetail = async (article) => {
   try {
     await db.detail.put({
-      id: article.url, // Menggunakan URL sebagai primary key
+      id: article.url, 
       source: article.source?.name || "Unknown",
       author: article.author || "Unknown",
       title: article.title,
@@ -61,13 +57,21 @@ export const saveArticleDetail = async (article) => {
   }
 };
 
-// Fungsi untuk mendapatkan detail berita berdasarkan URL
 export const getArticleDetail = async (url) => {
   try {
     return await db.detail.where("url").equals(url).first();
   } catch (error) {
     console.error("Error fetching article detail from IndexedDB:", error);
     return null;
+  }
+};
+
+export const clearArticles = async () => {
+  try {
+    await db.articles.clear();
+    console.log("All articles have been cleared from IndexedDB.");
+  } catch (error) {
+    console.error("Error clearing articles from IndexedDB:", error);
   }
 };
 
